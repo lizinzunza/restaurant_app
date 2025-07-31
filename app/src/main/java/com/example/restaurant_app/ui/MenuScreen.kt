@@ -38,7 +38,6 @@ fun MenuScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 70.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -159,8 +158,6 @@ fun MenuScreen() {
                 DishCard(R.drawable.tamales, "Tamales", "5-10 min", "$6.50")
             }
         }
-
-        BottomNavigationBar(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -209,34 +206,7 @@ fun DishCard(imageRes: Int, name: String, time: String, price: String, modifier:
     }
 }
 
-@Composable
-fun BottomNavigationBar(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .background(Color(0xFFE6007E)),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        BottomNavItem(R.drawable.ic_menu, "Menú")
-        BottomNavItem(R.drawable.ic_pedido, "Pedido")
-        BottomNavItem(R.drawable.ic_status, "Status")
-        BottomNavItem(R.drawable.ic_restaurante, "Restaurante")
-    }
-}
 
-@Composable
-fun BottomNavItem(iconRes: Int, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Image(
-            painter = painterResource(id = iconRes),
-            contentDescription = label,
-            modifier = Modifier.size(28.dp)
-        )
-        Text(label, color = Color.White, fontSize = 12.sp)
-    }
-}
 
 @Composable
 fun CategoryItem(imageRes: Int, label: String, selected: Boolean) {
