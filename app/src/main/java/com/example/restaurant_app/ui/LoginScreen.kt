@@ -3,120 +3,176 @@ package com.example.restaurant_app.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.restaurant_app.R
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.platform.LocalDensity
 
 @Composable
 fun LoginScreen(onLoginClick: () -> Unit) {
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFE6007E))
+            .background(Color(0xFFFFF8F0)) // Fondo beige muy claro
     ) {
+        // Fondo con patrones mexicanos sutiles
         Image(
-            painter = painterResource(id = R.drawable.papel_picado),
-            contentDescription = "Decoración superior",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(600.dp)
-                .align(Alignment.TopCenter)
-                .offset(y = (-250).dp)
+            painter = painterResource(id = R.drawable.fondo_menu),
+            contentDescription = "Fondo mexicano",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 60.dp, bottom = 90.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(bottom = 70.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo
+            // Papel picado decorativo
             Image(
-                painter = painterResource(id = R.drawable.logo_bowl),
-                contentDescription = "Logo",
+                painter = painterResource(id = R.drawable.papel_picado),
+                contentDescription = "Papel picado",
                 modifier = Modifier
-                    .size(140.dp)
-                    .clip(CircleShape)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "Mexitasty",
-                fontSize = 36.sp,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = onLoginClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
+                    .fillMaxWidth()
                     .height(50.dp)
-            ) {
-                Text(
-                    text = "Entrar",
-                    color = Color.Black,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+            )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(110.dp)
-                .align(Alignment.BottomCenter)
-                .offset(y = 10  .dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.cactus1),
-                contentDescription = "Cactus 1",
-                modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp)
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Título "Inicia sesión"
+            Text(
+                text = "Inicia sesión",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF8B0000), // Rojo oscuro
+                modifier = Modifier.padding(bottom = 30.dp)
             )
-            Image(
-                painter = painterResource(id = R.drawable.cactus2),
-                contentDescription = "Cactus 2",
+
+            // Contenedor principal con la piñata y campos
+            Surface(
                 modifier = Modifier
-                    .height(70.dp)
-                    .width(60.dp)
-            )
-            Image(
-                painter = painterResource(id = R.drawable.cactus3),
-                contentDescription = "Cactus 3",
-                modifier = Modifier
-                    .height(90.dp)
-                    .width(90.dp)
-            )
-            Image(
-                painter = painterResource(id = R.drawable.cactus4),
-                contentDescription = "Cactus 4",
-                modifier = Modifier
-                    .height(70.dp)
-                    .width(70.dp)
-            )
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                shape = RoundedCornerShape(20.dp),
+                shadowElevation = 8.dp,
+                color = Color(0xFFFFF6E8) // Beige claro
+            ) {
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Ilustración de piñata
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_bowl), // Usando logo temporal como piñata
+                        contentDescription = "Piñata",
+                        modifier = Modifier
+                            .size(140.dp)
+                            .padding(bottom = 24.dp)
+                    )
+
+                    // Campo de nombre de usuario
+                    Text(
+                        text = "Nombre de usuario",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF008080), // Verde azulado
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(bottom = 8.dp)
+                    )
+                    
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        placeholder = {
+                            Text(
+                                text = "Ingresa Nombre de usuario",
+                                color = Color.Gray,
+                                fontSize = 14.sp
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent
+                        ),
+                        singleLine = true
+                    )
+
+                    // Campo de contraseña
+                    Text(
+                        text = "Contraseña",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF008080), // Verde azulado
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(bottom = 8.dp)
+                    )
+                    
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        placeholder = {
+                            Text(
+                                text = "Ingresa Contraseña",
+                                color = Color.Gray,
+                                fontSize = 14.sp
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 32.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent
+                        ),
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        singleLine = true
+                    )
+
+                    // Botón de ingresar
+                    Button(
+                        onClick = onLoginClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE6007E)) // Rosa fucsia
+                    ) {
+                        Text(
+                            text = "Ingresar",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
         }
     }
 }
