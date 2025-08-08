@@ -33,6 +33,16 @@ fun OrderScreen() {
             contentScale = ContentScale.Crop
         )
 
+        Image(
+            painter = painterResource(id = R.drawable.papel_picado),
+            contentDescription = "Papel picado",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(600.dp)
+                .align(Alignment.TopCenter)
+                .offset(y = (-250).dp)
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -40,23 +50,18 @@ fun OrderScreen() {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.papel_picado),
-                contentDescription = "Papel picado",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            )
+            Spacer(modifier = Modifier.height(100.dp))
 
             Text(
                 text = "Mi Pedido",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF8B4513),
-                modifier = Modifier.padding(16.dp)
+                color = Color(0xFFE6007E),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.Start)
             )
-
-            // Items del pedido
+            
             OrderItem(
                 imageRes = R.drawable.tacos,
                 name = "Tacos al Pastor",
@@ -168,27 +173,26 @@ fun OrderScreen() {
                             fontWeight = FontWeight.Bold
                         )
                     }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Botón de realizar pedido
+                    Button(
+                        onClick = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFF6E8))
+                    ) {
+                        Text(
+                            text = "Realizar mi pedido",
+                            color = Color(0xFF8B4513),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Botón de realizar pedido
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFF6E8))
-            ) {
-                Text(
-                    text = "Realizar mi pedido",
-                    color = Color(0xFF8B4513),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
