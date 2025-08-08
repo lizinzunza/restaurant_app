@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.example.restaurant_app.R
 
 @Composable
-fun StatusScreen() {
+fun StatusScreen(onLogoutClick: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -43,6 +46,28 @@ fun StatusScreen() {
                 .align(Alignment.TopCenter)
                 .offset(y = (-250).dp)
         )
+
+        // Botón de cerrar sesión
+        Surface(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 40.dp, end = 16.dp)
+                .size(48.dp),
+            shape = RoundedCornerShape(24.dp),
+            color = Color(0xFFE6007E)
+        ) {
+            IconButton(
+                onClick = onLogoutClick,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ExitToApp,
+                    contentDescription = "Cerrar sesión",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
 
         Column(
             modifier = Modifier

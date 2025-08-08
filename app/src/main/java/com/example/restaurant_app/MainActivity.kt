@@ -183,13 +183,25 @@ fun AppNavHost(navController: NavHostController) {
             LoginScreen(onLoginClick = { navController.navigate("menu") })
         }
         composable("menu") {
-            MenuScreen()
+            MenuScreen(onLogoutClick = { 
+                navController.navigate("login") { 
+                    popUpTo(0) { inclusive = true } 
+                }
+            })
         }
         composable("order") {
-            OrderScreen()
+            OrderScreen(onLogoutClick = { 
+                navController.navigate("login") { 
+                    popUpTo(0) { inclusive = true } 
+                }
+            })
         }
         composable("status") {
-            StatusScreen()
+            StatusScreen(onLogoutClick = { 
+                navController.navigate("login") { 
+                    popUpTo(0) { inclusive = true } 
+                }
+            })
         }
         composable("restaurant") {
             RestaurantScreen()
