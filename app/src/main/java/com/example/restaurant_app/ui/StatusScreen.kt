@@ -34,6 +34,16 @@ fun StatusScreen() {
             contentScale = ContentScale.Crop
         )
 
+        Image(
+            painter = painterResource(id = R.drawable.papel_picado),
+            contentDescription = "Papel picado",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(600.dp)
+                .align(Alignment.TopCenter)
+                .offset(y = (-250).dp)
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -41,20 +51,16 @@ fun StatusScreen() {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.papel_picado),
-                contentDescription = "Papel picado",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            )
+            Spacer(modifier = Modifier.height(100.dp))
 
             Text(
                 text = "Status",
-                fontSize = 32.sp,
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF8B4513),
-                modifier = Modifier.padding(16.dp)
+                color = Color(0xFFE6007E),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.Start)
             )
 
             // Tarjeta principal con el contenido
@@ -77,6 +83,8 @@ fun StatusScreen() {
                         color = Color(0xFFE6007E)
                     )
                     
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
                     Text(
                         text = "Estimado 20- 25 min",
                         fontSize = 16.sp,
@@ -84,12 +92,12 @@ fun StatusScreen() {
                         modifier = Modifier.padding(top = 4.dp)
                     )
                     
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
                     
                     // Barra de progreso
                     OrderProgressBar()
                     
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
                     
                     // Sección de orden
                     Text(

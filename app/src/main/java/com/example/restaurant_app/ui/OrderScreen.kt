@@ -54,7 +54,7 @@ fun OrderScreen() {
 
             Text(
                 text = "Mi Pedido",
-                fontSize = 32.sp,
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFE6007E),
                 modifier = Modifier
