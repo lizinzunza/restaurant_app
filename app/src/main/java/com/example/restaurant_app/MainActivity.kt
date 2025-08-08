@@ -9,10 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,26 +19,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.restaurant_app.ui.LoginScreen
 import com.example.restaurant_app.ui.MenuScreen
 import com.example.restaurant_app.ui.OrderScreen
 import com.example.restaurant_app.ui.StatusScreen
 import com.example.restaurant_app.ui.RestaurantScreen
 import com.example.restaurant_app.ui.theme.Restaurant_appTheme
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.restaurant_app.R
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
-        // Configurar para pantalla completa edge-to-edge
+
+        // Configurar pantalla completa edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        
+
         setContent {
             Restaurant_appTheme {
                 val navController = rememberNavController()
@@ -55,43 +51,45 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppWithBottomNavigation(navController: NavHostController) {
     var selectedTab by remember { mutableStateOf(0) }
-    
-    // Observar cambios en la ruta actual
-    LaunchedEffect(navController.currentDestination?.route) {
-        when (navController.currentDestination?.route) {
+
+    // Ruta actual en tiempo real
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    LaunchedEffect(currentRoute) {
+        when (currentRoute) {
             "menu" -> selectedTab = 0
             "order" -> selectedTab = 1
             "status" -> selectedTab = 2
             "restaurant" -> selectedTab = 3
         }
     }
-    
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            val currentRoute = navController.currentDestination?.route
             if (currentRoute != "login") {
                 BottomNavigationBar(
                     selectedTab = selectedTab,
                     onTabSelected = { tabIndex ->
                         selectedTab = tabIndex
                         when (tabIndex) {
-                            0 -> navController.navigate("menu") { 
+                            0 -> navController.navigate("menu") {
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                            1 -> navController.navigate("order") { 
+                            1 -> navController.navigate("order") {
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                            2 -> navController.navigate("status") { 
+                            2 -> navController.navigate("status") {
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                            3 -> navController.navigate("restaurant") { 
+                            3 -> navController.navigate("restaurant") {
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
@@ -198,4 +196,3 @@ fun AppNavHost(navController: NavHostController) {
         }
     }
 }
-
