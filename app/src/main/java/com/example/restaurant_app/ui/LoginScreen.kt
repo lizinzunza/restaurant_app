@@ -39,8 +39,7 @@ fun LoginScreen(onLoginClick: () -> Unit) {
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 60.dp, bottom = 90.dp),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -78,14 +77,13 @@ fun LoginScreen(onLoginClick: () -> Unit) {
                     fontWeight = FontWeight.Bold
                 )
             }
-        }
+                }
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(110.dp)
-                .align(Alignment.BottomCenter)
-                .offset(y = 10  .dp),
+                .align(Alignment.BottomCenter),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.Bottom
         ) {

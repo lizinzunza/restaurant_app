@@ -4,10 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowCompat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,6 +39,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Configurar para pantalla completa edge-to-edge
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
         setContent {
             Restaurant_appTheme {
                 val navController = rememberNavController()
@@ -60,7 +69,8 @@ fun AppWithBottomNavigation(navController: NavHostController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (navController.currentDestination?.route != "login") {
+            val currentRoute = navController.currentDestination?.route
+            if (currentRoute != "login") {
                 BottomNavigationBar(
                     selectedTab = selectedTab,
                     onTabSelected = { tabIndex ->
@@ -95,7 +105,6 @@ fun AppWithBottomNavigation(navController: NavHostController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
         ) {
             AppNavHost(navController)
         }
