@@ -67,7 +67,7 @@ fun StatusScreen() {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 24.dp),
                 shape = RoundedCornerShape(16.dp),
                 shadowElevation = 8.dp,
                 color = Color(0xFFFFF6E8)

@@ -83,7 +83,7 @@ fun MenuScreen() {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 12.dp),
                 shape = RoundedCornerShape(32.dp),
                 shadowElevation = 6.dp,
                 tonalElevation = 6.dp,
@@ -125,7 +125,7 @@ fun MenuScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 CategoryItem(
@@ -148,15 +148,19 @@ fun MenuScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(horizontal = 16.dp)
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
             ) {
                 DishCard(R.drawable.tacos, "Tacos al pastor", "10-15 min", "$7.50")
                 DishCard(R.drawable.enchiladas, "Enchiladas verdes", "15-20 min", "$5.50")
             }
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(horizontal = 16.dp)
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
             ) {
                 DishCard(R.drawable.pozole, "Pozole", "20-25 min", "$5.70")
                 DishCard(R.drawable.tamales, "Tamales", "5-10 min", "$6.50")
@@ -169,7 +173,7 @@ fun MenuScreen() {
 fun DishCard(imageRes: Int, name: String, time: String, price: String, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier
-            .width(160.dp)
+            .width(190.dp)
             .padding(8.dp),
         shape = RoundedCornerShape(24.dp),
         shadowElevation = 6.dp,
