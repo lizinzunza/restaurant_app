@@ -35,24 +35,28 @@ fun MenuScreen() {
             contentScale = ContentScale.Crop
         )
 
+        Image(
+            painter = painterResource(id = R.drawable.papel_picado),
+            contentDescription = "Papel picado",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(600.dp)
+                .align(Alignment.TopCenter)
+                .offset(y = (-250).dp)
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.papel_picado),
-                contentDescription = "Papel picado",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            )
+            Spacer(modifier = Modifier.height(100.dp))
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
