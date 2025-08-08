@@ -39,6 +39,16 @@ fun RestaurantScreen() {
             contentScale = ContentScale.Crop
         )
 
+        Image(
+            painter = painterResource(id = R.drawable.papel_picado),
+            contentDescription = "Papel picado",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(600.dp)
+                .align(Alignment.TopCenter)
+                .offset(y = (-250).dp)
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -46,24 +56,16 @@ fun RestaurantScreen() {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Papel picado decorativo
-            Image(
-                painter = painterResource(id = R.drawable.papel_picado),
-                contentDescription = "Papel picado",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            )
+            Spacer(modifier = Modifier.height(130.dp))
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Título "Restaurante"
             Text(
-                text = "Restaurante",
-                fontSize = 32.sp,
+                text = "Inicia sesión",
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF8B0000), // Rojo oscuro
-                modifier = Modifier.padding(bottom = 30.dp)
+                color = Color(0xFF8B0000),
+                modifier = Modifier
+                    .padding(start = 16.dp, bottom = 10.dp)
+                    .align(Alignment.Start)
             )
 
             // Contenedor principal con formulario de login
@@ -81,23 +83,12 @@ fun RestaurantScreen() {
                 ) {
                     // Ilustración del restaurante (usando logo temporal)
                     Image(
-                        painter = painterResource(id = R.drawable.logo_bowl),
+                        painter = painterResource(id = R.drawable.pinata),
                         contentDescription = "Restaurante Mexicano",
                         modifier = Modifier
-                            .size(140.dp)
+                            .size(280.dp)
                             .padding(bottom = 24.dp)
                     )
-
-                    // Nombre del restaurante
-                    Text(
-                        text = "Mexitasty",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE6007E), // Rosa
-                        modifier = Modifier.padding(bottom = 24.dp)
-                    )
-
-                    // Campo de nombre de usuario
                     Text(
                         text = "Nombre de usuario",
                         fontSize = 16.sp,

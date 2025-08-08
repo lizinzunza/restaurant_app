@@ -57,7 +57,7 @@ fun StatusScreen() {
                 text = "Status",
                 fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFE6007E),
+                color = Color(0xFF8B0000),
                 modifier = Modifier
                     .padding(16.dp)
                     .align(Alignment.Start)

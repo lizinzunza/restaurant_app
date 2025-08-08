@@ -63,7 +63,7 @@ fun MenuScreen() {
                     text = "Mexitasty",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFE6007E),
+                    color = Color(0xFF8B0000),
                     modifier = Modifier.weight(1f)
                 )
                 Surface(
