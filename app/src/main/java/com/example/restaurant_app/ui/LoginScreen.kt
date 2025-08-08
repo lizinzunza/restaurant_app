@@ -44,7 +44,6 @@ fun LoginScreen(onLoginClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo
             Image(
                 painter = painterResource(id = R.drawable.logo_bowl),
                 contentDescription = "Logo",
