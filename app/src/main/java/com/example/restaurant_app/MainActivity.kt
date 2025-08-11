@@ -24,12 +24,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.restaurant_app.ui.LoginScreen
 import com.example.restaurant_app.ui.MenuScreen
 import com.example.restaurant_app.ui.OrderScreen
 import com.example.restaurant_app.ui.StatusScreen
 import com.example.restaurant_app.ui.RestaurantScreen
 import com.example.restaurant_app.ui.theme.Restaurant_appTheme
+import com.example.restaurant_app.viewmodel.CartViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +53,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppWithBottomNavigation(navController: NavHostController) {
     var selectedTab by remember { mutableStateOf(0) }
+    val cartViewModel: CartViewModel = viewModel()
 
     // Ruta actual en tiempo real
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -95,7 +98,8 @@ fun AppWithBottomNavigation(navController: NavHostController) {
                                 restoreState = true
                             }
                         }
-                    }
+                    },
+                    cartViewModel = cartViewModel
                 )
             }
         }
@@ -104,7 +108,7 @@ fun AppWithBottomNavigation(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            AppNavHost(navController)
+            AppNavHost(navController, cartViewModel)
         }
     }
 }
@@ -112,8 +116,11 @@ fun AppWithBottomNavigation(navController: NavHostController) {
 @Composable
 fun BottomNavigationBar(
     selectedTab: Int,
-    onTabSelected: (Int) -> Unit
+    onTabSelected: (Int) -> Unit,
+    cartViewModel: CartViewModel
 ) {
+    val totalItems = cartViewModel.getTotalItems()
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +139,8 @@ fun BottomNavigationBar(
             iconRes = R.drawable.ic_pedido,
             label = "Pedido",
             selected = selectedTab == 1,
-            onClick = { onTabSelected(1) }
+            onClick = { onTabSelected(1) },
+            badgeCount = if (totalItems > 0) totalItems else null
         )
         BottomNavItem(
             iconRes = R.drawable.ic_status,
@@ -154,47 +162,76 @@ fun BottomNavItem(
     iconRes: Int,
     label: String,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    badgeCount: Int? = null
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
         modifier = Modifier
             .padding(vertical = 4.dp)
             .clickable { onClick() }
     ) {
-        Image(
-            painter = painterResource(id = iconRes),
-            contentDescription = label,
-            modifier = Modifier.size(28.dp)
-        )
-        Text(
-            label,
-            color = if (selected) Color(0xFFFFE066) else Color.White,
-            fontSize = 12.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = label,
+                modifier = Modifier.size(28.dp)
+            )
+            Text(
+                label,
+                color = if (selected) Color(0xFFFFE066) else Color.White,
+                fontSize = 12.sp,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+            )
+        }
+        
+        // Badge para mostrar cantidad
+        badgeCount?.let { count ->
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 8.dp, y = (-4).dp),
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFFFF4444)
+            ) {
+                Text(
+                    text = if (count > 99) "99+" else count.toString(),
+                    color = Color.White,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(navController: NavHostController, cartViewModel: CartViewModel) {
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             LoginScreen(onLoginClick = { navController.navigate("menu") })
         }
         composable("menu") {
-            MenuScreen(onLogoutClick = { 
-                navController.navigate("login") { 
-                    popUpTo(0) { inclusive = true } 
-                }
-            })
+            MenuScreen(
+                onLogoutClick = { 
+                    navController.navigate("login") { 
+                        popUpTo(0) { inclusive = true } 
+                    }
+                },
+                cartViewModel = cartViewModel
+            )
         }
         composable("order") {
-            OrderScreen(onLogoutClick = { 
-                navController.navigate("login") { 
-                    popUpTo(0) { inclusive = true } 
-                }
-            })
+            OrderScreen(
+                onLogoutClick = { 
+                    navController.navigate("login") { 
+                        popUpTo(0) { inclusive = true } 
+                    }
+                },
+                cartViewModel = cartViewModel
+            )
         }
         composable("status") {
             StatusScreen(onLogoutClick = { 
