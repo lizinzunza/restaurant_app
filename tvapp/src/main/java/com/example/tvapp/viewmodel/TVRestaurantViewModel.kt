@@ -1,4 +1,3 @@
-// viewmodel/TVRestaurantViewModel.kt (versión TV - solo lectura)
 package com.example.tvapp.viewmodel
 
 import androidx.lifecycle.ViewModel

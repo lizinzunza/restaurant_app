@@ -1,4 +1,3 @@
-// model/PedidoResponse.kt (copia exacta de tu app móvil)
 package com.example.tvapp.model
 
 data class PedidoResponse(

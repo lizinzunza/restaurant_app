@@ -1,4 +1,3 @@
 <resources>
-
-    <style name="Theme.Restaurant_app" parent="Theme.AppCompat.DayNight.NoActionBar" />
+    <style name="Theme.Restaurant_app" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

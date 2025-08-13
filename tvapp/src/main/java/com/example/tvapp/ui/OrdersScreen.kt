@@ -1,4 +1,4 @@
-// ui/OrdersScreen.kt (actualizada con sincronización)
+// ui/OrdersScreen.kt (CON LOGS DE DEBUG)
 package com.example.tvapp.ui
 
 import androidx.compose.foundation.Image
@@ -31,6 +31,21 @@ fun OrdersScreen(
 ) {
     val mesas by tvRestaurantViewModel.mesas.collectAsState()
     val isLoading by tvRestaurantViewModel.isLoading.collectAsState()
+
+    // LOGS DE DEBUG EN UI
+    LaunchedEffect(mesas) {
+        println("🖥️ UI OrdersScreen - Mesas actualizadas: ${mesas.size}")
+        mesas.forEachIndexed { index, mesa ->
+            println("🖥️ UI Mesa [$index]: Número ${mesa.numero}, Tiene pedido: ${mesa.pedido != null}")
+            if (mesa.pedido != null) {
+                println("🖥️ UI Mesa ${mesa.numero} - Pedido: ${mesa.pedido!!.pedidos}, Status: ${mesa.pedido!!.status}")
+            }
+        }
+    }
+
+    LaunchedEffect(isLoading) {
+        println("🖥️ UI OrdersScreen - Estado de carga: $isLoading")
+    }
 
     Box(
         modifier = Modifier
@@ -73,7 +88,7 @@ fun OrdersScreen(
             // Espaciado para el papel picado
             Spacer(modifier = Modifier.height(90.dp))
 
-            // Título "Órdenes" con indicador de conexión
+            // Título "Órdenes" con indicador de conexión y DEBUG INFO
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,6 +103,23 @@ fun OrdersScreen(
                 )
 
                 Spacer(modifier = Modifier.width(24.dp))
+
+                // DEBUG INFO - Contador de mesas
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = Color(0xFF2196F3),
+                    shadowElevation = 4.dp
+                ) {
+                    Text(
+                        text = "Mesas: ${mesas.size}",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
 
                 // Indicador de conexión/carga
                 if (isLoading) {
@@ -163,6 +195,42 @@ fun OrdersScreen(
                 }
             }
 
+            // INFORMACIÓN DE DEBUG
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 48.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0xFFE3F2FD),
+                shadowElevation = 2.dp
+            ) {
+//                Column(
+//                    modifier = Modifier.padding(16.dp)
+//                ) {
+//                    Text(
+//                        text = "🔍 DEBUG INFO",
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight.Bold,
+//                        color = Color(0xFF1976D2)
+//                    )
+//                    Text(
+//                        text = "Total mesas: ${mesas.size}",
+//                        fontSize = 14.sp,
+//                        color = Color(0xFF1976D2)
+//                    )
+//                    Text(
+//                        text = "Cargando: $isLoading",
+//                        fontSize = 14.sp,
+//                        color = Color(0xFF1976D2)
+//                    )
+//                    Text(
+//                        text = "Mesas con pedidos: ${mesas.count { it.pedido != null }}",
+//                        fontSize = 14.sp,
+//                        color = Color(0xFF1976D2)
+//                    )
+//                }
+            }
+
             // Lista de mesas con datos reales
             Column(
                 modifier = Modifier
@@ -170,11 +238,15 @@ fun OrdersScreen(
                     .padding(horizontal = 48.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
+                println("🖥️ UI Renderizando ${mesas.size} mesas")
+
                 if (mesas.isNotEmpty()) {
                     mesas.forEach { mesa ->
+                        println("🖥️ UI Renderizando mesa ${mesa.numero}")
                         TableCardTV(
                             mesa = mesa,
                             onClick = {
+                                println("🖥️ UI Click en mesa ${mesa.numero}")
                                 if (mesa.pedido != null) {
                                     tvRestaurantViewModel.selectOrder(mesa.numero)
                                     onTableClick("Mesa ${mesa.numero}")
@@ -183,6 +255,7 @@ fun OrdersScreen(
                         )
                     }
                 } else {
+                    println("🖥️ UI No hay mesas para mostrar")
                     // Estado de carga o sin pedidos
                     Surface(
                         modifier = Modifier
@@ -281,6 +354,8 @@ fun TableCardTV(
     mesa: com.example.tvapp.viewmodel.MesaTV,
     onClick: () -> Unit
 ) {
+    println("🖥️ UI TableCardTV - Mesa ${mesa.numero}, Tiene pedido: ${mesa.pedido != null}")
+
     val backgroundColor = Color(mesa.color)
     val hasPedido = mesa.pedido != null
 
@@ -331,6 +406,14 @@ fun TableCardTV(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Estado: $statusText",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Sin pedidos",
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium

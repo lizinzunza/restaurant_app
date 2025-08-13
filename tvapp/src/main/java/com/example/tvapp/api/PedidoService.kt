@@ -1,4 +1,3 @@
-// api/PedidoService.kt (solo los endpoints de lectura que necesitas)
 package com.example.tvapp.api
 
 import com.example.tvapp.model.PedidoResponse

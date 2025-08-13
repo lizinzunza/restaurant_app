@@ -1,4 +1,4 @@
-// ui/TableOrderDetailScreen.kt (nueva para TV)
+// ui/TableOrderDetailScreen.kt (CON COLUMNA PLATILLOS SCROLLEABLE)
 package com.example.tvapp.ui
 
 import androidx.compose.foundation.Image
@@ -240,7 +240,7 @@ fun TableOrderDetailScreen(
 
             Spacer(modifier = Modifier.width(32.dp))
 
-            // Columna derecha - Lista de platillos
+            // Columna derecha - Lista de platillos (AHORA SCROLLEABLE)
             Column(
                 modifier = Modifier
                     .weight(0.4f)
@@ -255,15 +255,24 @@ fun TableOrderDetailScreen(
                 )
 
                 selectedOrder?.let { order ->
-                    LazyColumnTV(
-                        items = order.pedidos.groupBy { it }.toList()
-                    ) { (platillo, lista) ->
-                        OrderItemCardTV(
-                            imageRes = getImageForDish(platillo),
-                            name = platillo,
-                            time = getTimeForDish(platillo),
-                            quantity = lista.size
-                        )
+                    // COLUMNA SCROLLEABLE PARA PLATILLOS
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()), // ✅ SCROLL AGREGADO
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        order.pedidos.groupBy { it }.toList().forEach { (platillo, lista) ->
+                            OrderItemCardTV(
+                                imageRes = getImageForDish(platillo),
+                                name = platillo,
+                                time = getTimeForDish(platillo),
+                                quantity = lista.size
+                            )
+                        }
+
+                        // Espaciado final para que el último elemento no quede pegado al borde
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 } ?: run {
                     Surface(
@@ -309,21 +318,7 @@ fun TableOrderDetailScreen(
     }
 }
 
-@Composable
-fun LazyColumnTV(
-    items: List<Pair<String, List<String>>>,
-    content: @Composable (Pair<String, List<String>>) -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items.forEach { item ->
-            content(item)
-        }
-    }
-}
-
+// Resto de composables sin cambios
 @Composable
 fun TimeInfoCardTV(
     title: String,

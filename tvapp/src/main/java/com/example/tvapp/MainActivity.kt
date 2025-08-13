@@ -1,4 +1,4 @@
-// MainActivity.kt (corregido)
+// MainActivity.kt (VERSIÓN COMPLETA)
 package com.example.tvapp
 
 import android.os.Bundle
@@ -15,7 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tvapp.ui.OrdersScreen
 import com.example.tvapp.ui.TableOrderDetailScreen
-import com.example.tvapp.ui.theme.TvAppTheme // Usar el tema corregido
+import com.example.tvapp.ui.theme.TvAppTheme
 import com.example.tvapp.viewmodel.TVRestaurantViewModel
 
 class MainActivity : ComponentActivity() {
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            TvAppTheme { // Usar TvAppTheme
+            TvAppTheme {
                 val navController = rememberNavController()
                 TVAppNavigation(navController)
             }
