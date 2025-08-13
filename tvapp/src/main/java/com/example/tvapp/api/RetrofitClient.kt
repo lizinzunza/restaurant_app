@@ -1,5 +1,5 @@
-// api/RetrofitClient.kt (actualizado)
-package com.example.restaurant_app.api
+// api/RetrofitClient.kt (copia exacta de tu app móvil)
+package com.example.tvapp.api
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.0.49:3000/" // Tu URL actual
+    private const val BASE_URL = "http://192.168.0.49:3000/" // Tu misma URL
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -28,5 +28,4 @@ object RetrofitClient {
         .build()
 
     val pedidoService: PedidoService = retrofit.create(PedidoService::class.java)
-    val authService: AuthService = retrofit.create(AuthService::class.java) // Nueva línea
 }

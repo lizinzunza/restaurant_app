@@ -1,3 +1,4 @@
+// MainActivity.kt (versión corregida completa)
 package com.example.restaurant_app
 
 import android.os.Bundle
@@ -25,20 +26,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.restaurant_app.ui.LoginScreen
-import com.example.restaurant_app.ui.MenuScreen
-import com.example.restaurant_app.ui.OrderScreen
-import com.example.restaurant_app.ui.StatusScreen
-import com.example.restaurant_app.ui.RestaurantScreen
+import com.example.restaurant_app.ui.*
 import com.example.restaurant_app.ui.theme.Restaurant_appTheme
 import com.example.restaurant_app.viewmodel.CartViewModel
+import com.example.restaurant_app.viewmodel.RestaurantViewModel
+import com.example.restaurant_app.viewmodel.StatusViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        // Configurar pantalla completa edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
@@ -54,24 +51,30 @@ class MainActivity : ComponentActivity() {
 fun AppWithBottomNavigation(navController: NavHostController) {
     var selectedTab by remember { mutableStateOf(0) }
     val cartViewModel: CartViewModel = viewModel()
+    val restaurantViewModel: RestaurantViewModel = viewModel()
+    val statusViewModel: StatusViewModel = viewModel()
 
-    // Ruta actual en tiempo real
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    // Observar autenticación del restaurante
+    val isRestaurantAuthenticated by restaurantViewModel.isAuthenticated.collectAsState()
 
     LaunchedEffect(currentRoute) {
         when (currentRoute) {
             "menu" -> selectedTab = 0
             "order" -> selectedTab = 1
             "status" -> selectedTab = 2
-            "restaurant" -> selectedTab = 3
+            "restaurant", "orders" -> selectedTab = 3
+            // Para table_detail, mantener el tab actual sin cambiar
         }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (currentRoute != "login") {
+            val hideBottomNav = currentRoute in listOf("login")
+            if (!hideBottomNav) {
                 BottomNavigationBar(
                     selectedTab = selectedTab,
                     onTabSelected = { tabIndex ->
@@ -92,10 +95,20 @@ fun AppWithBottomNavigation(navController: NavHostController) {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                            3 -> navController.navigate("restaurant") {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
+                            3 -> {
+                                if (isRestaurantAuthenticated) {
+                                    navController.navigate("orders") {
+                                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                } else {
+                                    navController.navigate("restaurant") {
+                                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
                             }
                         }
                     },
@@ -104,11 +117,8 @@ fun AppWithBottomNavigation(navController: NavHostController) {
             }
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            AppNavHost(navController, cartViewModel)
+        Box(modifier = Modifier.fillMaxSize()) {
+            AppNavHost(navController, cartViewModel, restaurantViewModel, statusViewModel)
         }
     }
 }
@@ -120,11 +130,11 @@ fun BottomNavigationBar(
     cartViewModel: CartViewModel
 ) {
     val totalItems = cartViewModel.getTotalItems()
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
+            .height(70.dp)
             .background(Color(0xFFE6007E)),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
@@ -185,8 +195,7 @@ fun BottomNavItem(
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
             )
         }
-        
-        // Badge para mostrar cantidad
+
         badgeCount?.let { count ->
             Surface(
                 modifier = Modifier
@@ -208,16 +217,21 @@ fun BottomNavItem(
 }
 
 @Composable
-fun AppNavHost(navController: NavHostController, cartViewModel: CartViewModel) {
+fun AppNavHost(
+    navController: NavHostController,
+    cartViewModel: CartViewModel,
+    restaurantViewModel: RestaurantViewModel,
+    statusViewModel: StatusViewModel
+) {
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             LoginScreen(onLoginClick = { navController.navigate("menu") })
         }
         composable("menu") {
             MenuScreen(
-                onLogoutClick = { 
-                    navController.navigate("login") { 
-                        popUpTo(0) { inclusive = true } 
+                onLogoutClick = {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
                     }
                 },
                 cartViewModel = cartViewModel
@@ -225,23 +239,55 @@ fun AppNavHost(navController: NavHostController, cartViewModel: CartViewModel) {
         }
         composable("order") {
             OrderScreen(
-                onLogoutClick = { 
-                    navController.navigate("login") { 
-                        popUpTo(0) { inclusive = true } 
+                onLogoutClick = {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
                     }
                 },
                 cartViewModel = cartViewModel
             )
         }
         composable("status") {
-            StatusScreen(onLogoutClick = { 
-                navController.navigate("login") { 
-                    popUpTo(0) { inclusive = true } 
-                }
-            })
+            StatusScreen(
+                onLogoutClick = {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                statusViewModel = statusViewModel
+            )
         }
         composable("restaurant") {
-            RestaurantScreen()
+            RestaurantScreen(
+                onNavigateToOrders = {
+                    navController.navigate("orders") {
+                        popUpTo("restaurant") { inclusive = true }
+                    }
+                },
+                restaurantViewModel = restaurantViewModel
+            )
+        }
+        composable("orders") {
+            OrdersScreen(
+                onTableClick = { tableNumber ->
+                    navController.navigate("table_detail/$tableNumber")
+                },
+                onLogout = {
+                    restaurantViewModel.logout()
+                    navController.navigate("restaurant") {
+                        popUpTo("orders") { inclusive = true }
+                    }
+                },
+                restaurantViewModel = restaurantViewModel
+            )
+        }
+        composable("table_detail/{tableNumber}") { backStackEntry ->
+            val tableNumber = backStackEntry.arguments?.getString("tableNumber") ?: ""
+            TableOrderDetailScreen(
+                tableNumber = tableNumber,
+                onBack = { navController.popBackStack() },
+                restaurantViewModel = restaurantViewModel
+            )
         }
     }
 }

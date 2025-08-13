@@ -155,7 +155,7 @@ fun MenuScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(85.dp))
 
             Row(
                 modifier = Modifier

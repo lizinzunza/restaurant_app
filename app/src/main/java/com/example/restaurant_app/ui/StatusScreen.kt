@@ -1,3 +1,4 @@
+// ui/StatusScreen.kt (completo corregido)
 package com.example.restaurant_app.ui
 
 import androidx.compose.foundation.Image
@@ -7,10 +8,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,10 +21,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.restaurant_app.R
+import com.example.restaurant_app.viewmodel.StatusViewModel
+import com.example.restaurant_app.viewmodel.calculateTimeElapsed
+import com.example.restaurant_app.viewmodel.formatElapsedTime
+import com.example.restaurant_app.viewmodel.calculateTotalEstimatedTime
+import com.example.restaurant_app.viewmodel.formatEstimatedTime
 
 @Composable
-fun StatusScreen(onLogoutClick: () -> Unit = {}) {
+fun StatusScreen(
+    onLogoutClick: () -> Unit = {},
+    statusViewModel: StatusViewModel = viewModel()
+) {
+    val currentOrder by statusViewModel.currentOrder.collectAsState()
+    val isLoading by statusViewModel.isLoading.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -47,7 +59,6 @@ fun StatusScreen(onLogoutClick: () -> Unit = {}) {
                 .offset(y = (-250).dp)
         )
 
-        // Botón de cerrar sesión
         Surface(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -88,138 +99,161 @@ fun StatusScreen(onLogoutClick: () -> Unit = {}) {
                     .align(Alignment.Start)
             )
 
-            // Tarjeta principal con el contenido
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(16.dp),
-                shadowElevation = 8.dp,
-                color = Color(0xFFFFF6E8)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
-                    // Sección de tiempo de espera
-                    Text(
-                        text = "Tu tiempo de espera",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE6007E)
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = "Estimado 20- 25 min",
-                        fontSize = 16.sp,
-                        color = Color(0xFF8B4513),
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                    
-                    Spacer(modifier = Modifier.height(32.dp))
-                    
-                    // Barra de progreso
-                    OrderProgressBar()
-                    
-                    Spacer(modifier = Modifier.height(32.dp))
-                    
-                    // Sección de orden
-                    Text(
-                        text = "Orden",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF0099CC),
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                    
-                    // Items del pedido
-                    StatusOrderItem(
-                        imageRes = R.drawable.tacos,
-                        name = "Tacos al Pastor",
-                        time = "10- 15 min",
-                        price = "$ 20",
-                        quantity = 1
-                    )
-                    
-                    StatusOrderItem(
-                        imageRes = R.drawable.tamales,
-                        name = "Tamales",
-                        time = "5- 10 min",
-                        price = "$ 15",
-                        quantity = 1
-                    )
-                    
-                    StatusOrderItem(
-                        imageRes = R.drawable.pozole,
-                        name = "Pozole",
-                        time = "20- 25 min",
-                        price = "$ 15",
-                        quantity = 1
-                    )
-                }
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(32.dp),
+                    color = Color(0xFFE6007E)
+                )
+            } else if (currentOrder != null) {
+                OrderStatusCard(currentOrder!!)
+            } else {
+                Text(
+                    text = "No hay pedidos activos",
+                    fontSize = 18.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(32.dp)
+                )
             }
         }
     }
 }
 
 @Composable
-fun OrderProgressBar() {
+fun OrderStatusCard(order: com.example.restaurant_app.model.PedidoResponse) {
+    val tiempoTranscurrido = calculateTimeElapsed(order.timestamp)
+    val tiempoEstimadoTotal = calculateTotalEstimatedTime(order.pedidos)
+    val tiempoRestante = maxOf(0, tiempoEstimadoTotal - tiempoTranscurrido.toInt())
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        shape = RoundedCornerShape(16.dp),
+        shadowElevation = 8.dp,
+        color = Color(0xFFFFF6E8)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            // Información de tiempo
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                TimeInfoCard(
+                    title = "Tiempo estimado",
+                    time = formatEstimatedTime(tiempoEstimadoTotal),
+                    color = Color(0xFFE6007E)
+                )
+
+                TimeInfoCard(
+                    title = "Tiempo restante",
+                    time = if (tiempoRestante > 0) formatEstimatedTime(tiempoRestante) else "¡Listo!",
+                    color = if (tiempoRestante > 0) Color(0xFF8B4513) else Color(0xFF4CAF50)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            OrderProgressBar(order.status)
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Orden",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF0099CC),
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            order.pedidos.groupBy { it }.forEach { (platillo, lista) ->
+                StatusOrderItem(
+                    imageRes = getImageForDish(platillo),
+                    name = platillo,
+                    time = getTimeForDish(platillo),
+                    price = "$${getPriceForDish(platillo)}",
+                    quantity = lista.size
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TimeInfoCard(
+    title: String,
+    time: String,
+    color: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = title,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = color
+        )
+        Text(
+            text = time,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
+    }
+}
+
+@Composable
+fun OrderProgressBar(currentStatus: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Icono 1: Clipboard (Orden colocada)
         ProgressIcon(
-            iconRes = R.drawable.ic_menu, // Usando icono temporal
-            isActive = true,
-            label = "Orden"
+            iconRes = R.drawable.ic_menu,
+            isActive = currentStatus >= 1,
+            label = "Recibido"
         )
-        
-        // Línea conectora
+
         Box(
             modifier = Modifier
                 .weight(1f)
                 .height(2.dp)
-                .background(Color(0xFF0099CC))
+                .background(if (currentStatus >= 2) Color(0xFF0099CC) else Color.Gray)
         )
-        
-        // Icono 2: Cooking pot (En preparación)
+
         ProgressIcon(
-            iconRes = R.drawable.ic_menu, // Usando icono temporal
-            isActive = true,
+            iconRes = R.drawable.ic_pedido,
+            isActive = currentStatus >= 2,
             label = "Preparando"
         )
-        
-        // Línea conectora
+
         Box(
             modifier = Modifier
                 .weight(1f)
                 .height(2.dp)
-                .background(Color(0xFF0099CC))
+                .background(if (currentStatus >= 3) Color(0xFF0099CC) else Color.Gray)
         )
-        
-        // Icono 3: Delivery scooter (En entrega)
+
         ProgressIcon(
-            iconRes = R.drawable.ic_menu, // Usando icono temporal
-            isActive = true,
-            label = "Enviando"
+            iconRes = R.drawable.ic_status,
+            isActive = currentStatus >= 3,
+            label = "Listo"
         )
-        
-        // Línea conectora
+
         Box(
             modifier = Modifier
                 .weight(1f)
                 .height(2.dp)
-                .background(Color.Gray)
+                .background(if (currentStatus >= 4) Color(0xFF0099CC) else Color.Gray)
         )
-        
-        // Icono 4: Checkmark (Completado)
+
         ProgressIcon(
-            iconRes = R.drawable.ic_menu, // Usando icono temporal
-            isActive = false,
+            iconRes = R.drawable.ic_restaurante,
+            isActive = currentStatus >= 4,
             label = "Entregado"
         )
     }
@@ -279,7 +313,6 @@ fun StatusOrderItem(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Imagen del platillo
             Image(
                 painter = painterResource(id = imageRes),
                 contentDescription = name,
@@ -288,10 +321,9 @@ fun StatusOrderItem(
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
-            
+
             Spacer(modifier = Modifier.width(12.dp))
-            
-            // Información del platillo
+
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -313,8 +345,7 @@ fun StatusOrderItem(
                     fontSize = 14.sp
                 )
             }
-            
-            // Cantidad
+
             Text(
                 text = quantity.toString(),
                 fontSize = 16.sp,
@@ -323,4 +354,34 @@ fun StatusOrderItem(
             )
         }
     }
-} 
+}
+
+private fun getImageForDish(dish: String): Int {
+    return when {
+        dish.contains("Tacos", ignoreCase = true) -> R.drawable.tacos
+        dish.contains("Tamales", ignoreCase = true) -> R.drawable.tamales
+        dish.contains("Pozole", ignoreCase = true) -> R.drawable.pozole
+        dish.contains("Enchiladas", ignoreCase = true) -> R.drawable.enchiladas
+        else -> R.drawable.tacos
+    }
+}
+
+private fun getTimeForDish(dish: String): String {
+    return when {
+        dish.contains("Tacos", ignoreCase = true) -> "12 min"
+        dish.contains("Tamales", ignoreCase = true) -> "8 min"
+        dish.contains("Pozole", ignoreCase = true) -> "22 min"
+        dish.contains("Enchiladas", ignoreCase = true) -> "18 min"
+        else -> "15 min"
+    }
+}
+
+private fun getPriceForDish(dish: String): Double {
+    return when {
+        dish.contains("Tacos", ignoreCase = true) -> 7.50
+        dish.contains("Tamales", ignoreCase = true) -> 6.50
+        dish.contains("Pozole", ignoreCase = true) -> 5.70
+        dish.contains("Enchiladas", ignoreCase = true) -> 5.50
+        else -> 7.50
+    }
+}

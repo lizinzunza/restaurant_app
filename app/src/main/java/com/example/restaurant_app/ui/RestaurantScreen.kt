@@ -1,3 +1,4 @@
+// ui/RestaurantScreen.kt (actualizado completo)
 package com.example.restaurant_app.ui
 
 import androidx.compose.foundation.Image
@@ -19,19 +20,45 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.restaurant_app.R
+import com.example.restaurant_app.viewmodel.RestaurantViewModel
 
 @Composable
-fun RestaurantScreen() {
+fun RestaurantScreen(
+    onNavigateToOrders: () -> Unit = {},
+    restaurantViewModel: RestaurantViewModel = viewModel()
+) {
+    val isAuthenticated by restaurantViewModel.isAuthenticated.collectAsState()
+
+    if (isAuthenticated) {
+        LaunchedEffect(Unit) {
+            onNavigateToOrders()
+        }
+    } else {
+        LoginForm(restaurantViewModel)
+    }
+}
+
+@Composable
+fun LoginForm(viewModel: RestaurantViewModel) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    
+
+    val isLoading by viewModel.isLoading.collectAsState()
+    val loginError by viewModel.loginError.collectAsState()
+
+    LaunchedEffect(username, password) {
+        if (loginError != null) {
+            viewModel.clearLoginError()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFF8F0)) // Fondo beige muy claro
+            .background(Color(0xFFFFF8F0))
     ) {
-        // Fondo con patrones mexicanos sutiles
         Image(
             painter = painterResource(id = R.drawable.fondo_menu),
             contentDescription = "Fondo mexicano",
@@ -68,43 +95,59 @@ fun RestaurantScreen() {
                     .align(Alignment.Start)
             )
 
-            // Contenedor principal con formulario de login
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp),
                 shape = RoundedCornerShape(20.dp),
                 shadowElevation = 8.dp,
-                color = Color(0xFFFFF6E8) // Beige claro
+                color = Color(0xFFFFF6E8)
             ) {
                 Column(
                     modifier = Modifier.padding(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Ilustración del restaurante (usando logo temporal)
                     Image(
                         painter = painterResource(id = R.drawable.pinata),
                         contentDescription = "Restaurante Mexicano",
                         modifier = Modifier
-                            .size(280.dp)
+                            .size(200.dp)
                             .padding(bottom = 24.dp)
                     )
+
+                    // Mostrar error si existe
+                    loginError?.let { error ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE))
+                        ) {
+                            Text(
+                                text = error,
+                                color = Color(0xFFD32F2F),
+                                modifier = Modifier.padding(12.dp),
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
                     Text(
                         text = "Nombre de usuario",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF008080), // Verde azulado
+                        color = Color(0xFF008080),
                         modifier = Modifier
                             .align(Alignment.Start)
                             .padding(bottom = 8.dp)
                     )
-                    
+
                     OutlinedTextField(
                         value = username,
                         onValueChange = { username = it },
                         placeholder = {
                             Text(
-                                text = "Ingresa Nombre de usuario",
+                                text = "Usuario",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
@@ -119,26 +162,26 @@ fun RestaurantScreen() {
                             unfocusedIndicatorColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent
                         ),
-                        singleLine = true
+                        singleLine = true,
+                        enabled = !isLoading
                     )
 
-                    // Campo de contraseña
                     Text(
                         text = "Contraseña",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF008080), // Verde azulado
+                        color = Color(0xFF008080),
                         modifier = Modifier
                             .align(Alignment.Start)
                             .padding(bottom = 8.dp)
                     )
-                    
+
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
                         placeholder = {
                             Text(
-                                text = "Ingresa Contraseña",
+                                text = "Contraseña",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
@@ -155,53 +198,41 @@ fun RestaurantScreen() {
                         ),
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        singleLine = true
+                        singleLine = true,
+                        enabled = !isLoading
                     )
 
-                    // Botón de ingresar
                     Button(
-                        onClick = { /* Aquí puedes agregar la lógica de login */ },
+                        onClick = { viewModel.login(username, password) },
+                        enabled = !isLoading && username.isNotBlank() && password.isNotBlank(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE6007E)) // Rosa fucsia
-                    ) {
-                        Text(
-                            text = "Ingresar",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFE6007E),
+                            disabledContainerColor = Color.Gray
                         )
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = Color.White
+                            )
+                        } else {
+                            Text(
+                                text = "Ingresar",
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                 }
             }
         }
     }
 }
-
-@Composable
-fun InfoRow(
-    label: String,
-    value: String,
-    color: Color
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top
-    ) {
-        Text(
-            text = label,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = color,
-            modifier = Modifier.width(100.dp)
-        )
-        Text(
-            text = value,
-            fontSize = 16.sp,
-            color = Color(0xFF8B4513), // Marrón
-            modifier = Modifier.weight(1f)
-        )
-    }
-} 

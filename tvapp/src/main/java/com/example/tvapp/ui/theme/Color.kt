@@ -1,3 +1,4 @@
+// ui/theme/Color.kt (crear este archivo)
 package com.example.tvapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
